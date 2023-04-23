@@ -77,13 +77,13 @@ int hashMap::calcHash2(string k){
 	int h = 0;
 	int prime = 11;
 	if(stringSize == 1){
-		h = k[0] % mapSize;
+		h = ((int)k[0]) % mapSize;
 	}
 	else if(stringSize == 2){
-		h = (k[0] = k[1]*prime)% mapSize;
+		h = (((int)k[0]) + ((int)k[1])*prime) % mapSize;
 	}
 	else{
-		h = (k[0] + k[1]*prime + k[2]*(prime*prime)) % mapSize;
+		h = (((int)k[0]) + ((int)k[1])*prime + ((int)k[2])*(prime*prime)) % mapSize;
 
 	}
 	return h;
