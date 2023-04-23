@@ -28,8 +28,7 @@ void hashMap::addKeyValue(string k, string v) {
 	idx = getIndex(k);
 	//check index
 	if(map[idx] == NULL){
-		map[idx]->keyword = k;
-		map[idx]->addValue(v);
+		map[idx] = new hashNode(k,v);
 		numKeys += 1;
 	}
 	else{
@@ -42,6 +41,7 @@ void hashMap::addKeyValue(string k, string v) {
 		reHash();
 	}
 
+
 }
 int hashMap::getIndex(string k) {
 	//we aint leaving this method without an index that works
@@ -52,9 +52,10 @@ int hashMap::getIndex(string k) {
 	}
 	else{
 		idx = calcHash2(k);
-	}
 
+	}
 	if(map[idx] == NULL || map[idx]->keyword == k){
+
 		return idx;
 	}
 	else{
@@ -72,6 +73,21 @@ int hashMap::getIndex(string k) {
 }
 
 int hashMap::calcHash2(string k){
+	int stringSize = k.size();
+	int h = 0;
+	int prime = 11;
+	if(stringSize == 1){
+		h = k[0] % mapSize;
+	}
+	else if(stringSize == 2){
+		h = (k[0] = k[1]*prime)% mapSize;
+	}
+	else{
+		h = (k[0] + k[1]*prime + k[2]*(prime*prime)) % mapSize;
+
+	}
+	return h;
+
 }
 int hashMap::calcHash1(string k){
 	//code this
@@ -79,7 +95,7 @@ int hashMap::calcHash1(string k){
 	int h = 0;
 	int prime = 11;
 	for(int i = stringSize - 1; i > 0; i--){
-		h = (h * prime + ((int)k[i])) % 3463;
+		h = (h * prime + ((int)k[i])) % mapSize;
 	}
 	return h;
 }
@@ -95,6 +111,9 @@ int hashMap::coll1(int h, int i, string k) {
 			break;
 		}
 		probing +=1;
+		if(probing == mapSize){
+			probing = 0;
+		}
 		collisions +=1;
 	}
 
@@ -115,6 +134,7 @@ void hashMap::printMap() {
 			cout << endl;
 		}
 	}
+	cout << "There are: "<<numKeys<<" keys filled in the hashMap"<<endl;
 }
 
 
