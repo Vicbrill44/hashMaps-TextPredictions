@@ -38,6 +38,7 @@ void hashMap::addKeyValue(string k, string v) {
 	//load
 	int load = (int)((mapSize*70)/100);
 	if(numKeys>=load){
+
 		reHash();
 	}
 
@@ -100,8 +101,70 @@ int hashMap::calcHash1(string k){
 	return h;
 }
 void hashMap::getClosestPrime() {
+	int primesList[122] = {
+			31, 61, 97, 131, 173, 211, 251, 293, 337, 379, 419, 457, 499, 541, 577,
+			619, 661, 701, 739, 773, 811, 853, 887, 929, 967, 1009, 1049, 1091, 1129,
+			1169, 1201, 1249, 1291, 1327, 1367, 1409, 1451, 1487, 1523, 1567, 1607,
+			1657, 1693, 1733, 1777, 1811, 1847, 1889, 1931, 1979, 2017, 2053, 2099,
+			2137, 2179, 2221, 2267, 2309, 2347, 2381, 2417, 2459, 2503, 2539, 2591,
+			2633, 2683, 2719, 2767, 2803, 2843, 2887, 2939, 2971, 3011, 3049, 3089,
+			3137, 3181, 3221, 3259, 3299, 3343, 3389, 3433, 3469, 3511, 3557, 3593,
+			3631, 3671, 3709, 3761, 3803, 3847, 3881, 3919, 3967, 4007, 4051, 4091,
+			4127, 4177, 4217, 4259, 4297, 4339, 4373, 4421, 4463, 4507, 4547, 4591,
+			4639, 4679, 4721, 4759, 4801, 4831, 4877, 4919, 4951
+	};
+	int primeToFind = mapSize*2;
+	int primeLstLen = 122; //length of primes list
+	//binary search
+	int low = 0;
+	int high = primeLstLen - 1;
+	int mid = 0;
+	int foundPrime;
+	while(low<=high){
+		mid = low + (high - low) / 2;
+		if(primesList[mid]>primeToFind){
+			foundPrime = mid;
+			high = mid -1;
+		}
+		else{
+			low = mid + 1;
+		}
+	}
+	foundPrime = primesList[foundPrime];
+	mapSize = foundPrime;
+
 }
 void hashMap::reHash() {
+	//double size of mapSize
+	int oldMapSize = mapSize;
+	getClosestPrime();
+	int newIdx;
+
+
+	//initiialize a new map with the new size doubled
+	hashNode **newMap = new hashNode*[mapSize];
+	numKeys = 0;
+	int j = 0;
+	//set everything in the map as NULL
+	while(j<mapSize){
+		newMap[j] = NULL;
+		j++;
+	}
+
+	for(int i = 0; i<oldMapSize;i++){
+		hashNode *node = map[i];
+		if(node!=NULL){
+			hashNode *temp = node;
+			newIdx = getIndex(temp->keyword);
+			newMap[newIdx] = temp;
+			numKeys += 1;
+
+			delete temp;
+		}
+	}
+	//set map to be this newMap we created
+	map = newMap;
+
 }
 int hashMap::coll1(int h, int i, string k) {
 	int probing = i + 1;
@@ -120,6 +183,20 @@ int hashMap::coll1(int h, int i, string k) {
 	return probing;
 }
 int hashMap::coll2(int h, int i, string k) {
+	int counter = 0;
+	int probing = i;
+	while(map[probing]!= NULL){
+		if(map[probing]->keyword == k){
+			collisions +=1;
+			break;
+		}
+		probing = (probing +((int)pow(counter, counter))) % mapSize;
+		counter +=1;
+		if(probing > mapSize){
+			probing = 0;
+		}
+		collisions += 1;
+	}
 }
 
 void hashMap::printMap() {
@@ -136,5 +213,4 @@ void hashMap::printMap() {
 	}
 	cout << "There are: "<<numKeys<<" keys filled in the hashMap"<<endl;
 }
-
 
